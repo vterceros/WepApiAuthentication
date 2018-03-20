@@ -1,0 +1,33 @@
+﻿<script type="text/javascript">
+    $(function () {
+        $('#btnLogin').click(login);
+
+        function login() {
+            var user = $('#user').val();
+            var pwd = $('#pwd').val();
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:58330/token",
+                data: { grant_type: 'password', username: user, password: pwd, customer: 'MyCustomer' },
+                success: function (result) {
+                    sessionStorage.setItem("tokenkey", result.access_token);
+                    sessionStorage.setItem("userName", result.userName);
+                    sessionStorage.setItem("role", result.role);
+                    sessionStorage.setItem("other", result.other);
+                    alert('successful login');
+                },
+                error: function (result) {
+                    alert('wrong user or pwd');
+                }
+            });
+        }
+    });
+</script>
+<hr />
+<label>user:</label>
+<input type="text" id="user" /><br />
+<label>pwd:</label>
+<input type="password" id="pwd" /><br />
+<button id="btnLogin" >login</button><br />
+<h1 id="lblLoginSuccess"></h1>
+<hr />
