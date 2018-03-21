@@ -29,8 +29,18 @@ namespace apiauth.Providers
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            //Here we use the Custom Field sent in /Token
-            string customer = context.OwinContext.Get<string>("Customer");
+            //First way to get the custom param
+            var data = await context.Request.ReadFormAsync();
+            var param = data.Where(x => x.Key == "customer").Select(x => x.Value).FirstOrDefault();
+            string customer = "";
+            if (param != null && param.Length > 0)
+            {
+                customer = param[0];
+            }
+
+            //Second way to get the custom param see ValidateClientAuthentication method
+            string customer2 = context.OwinContext.Get<string>("Customer");
+
             var user = new { context.UserName, context.Password, customer };
             //
             if (user == null)
@@ -66,7 +76,7 @@ namespace apiauth.Providers
 
         public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
-            //Here we get the Custom Field sent in /Token
+            //Second way to get the custom param sent in /Token
             string[] customer = context.Parameters.Where(x => x.Key == "customer").Select(x => x.Value).FirstOrDefault();
             if (customer.Length > 0 && customer[0].Trim().Length > 0)
             {
